@@ -6,23 +6,16 @@ import Header from './components/headerControls';
 import { ThemeProvider } from './components/themeProvider';
 
 
-
 const Layout = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  const handleOnline = () => {
-    setIsOnline(true);
-  };
-
-  const handleOffline = () => {
-    setIsOnline(false);
-  };
-
   useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Cleanup event listeners on component unmount
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -30,20 +23,29 @@ const Layout = () => {
   }, []);
 
   return (
-    <>
-      <div>
-        <Header />
-        <nav className='pt-10'>
-          <Link to="/">Home</Link> | <Link to="/work">Work</Link>
-        </nav>
-        <div>
-            <p>You are currently {isOnline ? 'online' : 'offline'}</p>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+
+      {!isOnline ? (
+        <div className="flex-1 flex items-center justify-center bg-red-600 text-white text-center flex-col p-4">
+          <h1 className="text-3xl font-bold mb-2">You're Offline</h1>
+          <p className="text-lg">Please check your internet connection.</p>
         </div>
-        <Outlet />
-      </div>
-    </>
+      ) : (
+        <>
+          <nav className="pt-10 px-4">
+            <Link to="/" className="mr-4 text-blue-600 hover:underline">Home</Link>
+            <Link to="/work" className="text-blue-600 hover:underline">Work</Link>
+          </nav>
+          <main className="p-4 flex-1">
+            <Outlet />
+          </main>
+        </>
+      )}
+    </div>
   );
 };
+
 
 
 function App(): React.JSX.Element {
