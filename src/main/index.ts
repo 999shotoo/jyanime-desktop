@@ -10,6 +10,8 @@ function createWindow(): void {
     height: 670,
     show: false,
     autoHideMenuBar: true,
+    title: 'JyAnime',
+    frame: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -17,9 +19,13 @@ function createWindow(): void {
     }
   })
 
+
   mainWindow.on('ready-to-show', () => {
+    mainWindow.setTitle('JyAnime')
     mainWindow.show()
   })
+
+
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
@@ -33,6 +39,29 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+
+  // Window controls
+
+  ipcMain.on('window:minimize', () => mainWindow.minimize());
+  ipcMain.on('window:maximize', () => {
+    if (mainWindow.isMaximized()) mainWindow.unmaximize();
+    else mainWindow.maximize();
+  });
+  ipcMain.on('window:close', () => mainWindow.close());
+  ipcMain.handle('window:isMaximized', () => {
+    return mainWindow.isMaximized();
+  });
+
+  ipcMain.handle('window:isMinimized', () => {
+    return mainWindow.isMinimized();
+  });
+
+  ipcMain.handle('window:getTitle', () => {
+    return mainWindow.getTitle();
+  });
+
+
 }
 
 // This method will be called when Electron has finished
